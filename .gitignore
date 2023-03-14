@@ -1,3 +1,13 @@
-.idea
-objs
-*.ppm
+# Blocklist files/folders in same directory as the .gitignore file
+/*
+
+# allow for all subdirectories, but not elegant (because it add redundant empty folders)
+# !*/
+
+# allow some files
+!.gitignore
+!MY_README.md
+
+# allow those files (in subdirectories)
+!prog1_mandelbrot_threads/mandelbrotThread.cpp
+!prog1_mandelbrot_threads/mandelbrot.ipynb
