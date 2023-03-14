@@ -9,5 +9,7 @@
 !MY_README.md
 
 # allow those files (in subdirectories)
+!prog1_mandelbrot_threads
+prog1_mandelbrot_threads/*
 !prog1_mandelbrot_threads/mandelbrotThread.cpp
 !prog1_mandelbrot_threads/mandelbrot.ipynb
