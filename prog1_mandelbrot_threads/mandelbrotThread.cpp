@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <thread>
+#include <cmath>
 
 #include "CycleTimer.h"
 
@@ -22,6 +23,18 @@ extern void mandelbrotSerial(
     int maxIterations,
     int output[]);
 
+//
+// auxiliary functions START
+int fact(int n) {
+    if (n <= 1)
+        return 1;
+    return n * fact(n - 1);
+}
+
+int combination(int n, int r) {
+    return fact(n) / (fact(r) * fact(n - r));
+}
+// auxiliary functions END
 
 //
 // workerThreadStart --
@@ -35,16 +48,72 @@ void workerThreadStart(WorkerArgs * const args) {
     // program that uses two threads, thread 0 could compute the top
     // half of the image and thread 1 could compute the bottom half.
 
-    int numRows = args->height / args->numThreads;
-    int startRow = args->threadId * numRows;
-    // modification for the last thread
-    if (args->threadId == args->numThreads - 1)
-        numRows = args->height - startRow;
-    mandelbrotSerial(args->x0, args->y0, args->x1, args->y1,
-                     args->width, args->height,
-                     startRow, numRows,
-                     args->maxIterations,
-                     args->output);
+    double startTime = CycleTimer::currentSeconds();
+
+    // Not load balanced
+//    int startRow = 0;
+//    int n = args->numThreads;
+//    int id = args->threadId;
+//    int height = args->height;
+//    int tot = 0;
+//    {
+//        int start = (n+1)/2;
+//        //int start = exp2((n+1)/2-1);
+//        tot = (1 + start) * start;
+//        //tot = 2 * (2 * start - 1);
+//        if (n % 2 == 1)
+//            tot --;
+//    }
+//    float frac = 1.0 * args->height / tot;
+//    int numRows = 0;
+//    {
+//        int piece = (n+1)/2;
+//        //int piece = exp2((n+1)/2-1);
+//        for (int i = 0; i <= id; i++) {
+//            int numRowsForI = piece * frac;
+//            if (numRowsForI == 0) numRowsForI = 1;
+//            if (i < id)
+//                startRow += numRowsForI;
+//            else
+//                numRows = numRowsForI;
+//            if (i < (n-1)/2)
+//                piece --;
+//                //piece /= 2;
+//            else if (!(i == (n-1)/2 && n % 2 == 0))
+//                piece ++;
+//                //piece *= 2;
+//        }
+//    }
+//    // early exit due to too many threads
+//    if (startRow >= height)
+//        return;
+//    // modify last necessary thread if precision issue exits
+//    if (startRow + numRows > height)
+//        numRows = height - startRow;
+//    // modify last thread
+//    if (id == n - 1)
+//        numRows = height - startRow;
+//
+//    mandelbrotSerial(args->x0, args->y0, args->x1, args->y1,
+//                     args->width, args->height,
+//                     startRow, numRows,
+//                     args->maxIterations,
+//                     args->output);
+
+    // Load balanced
+    for (int i = args->threadId; i < args->height; i += args->numThreads) {
+        mandelbrotSerial(args->x0, args->y0, args->x1, args->y1,
+                 args->width, args->height,
+                 i, 1,
+                 args->maxIterations,
+                 args->output);
+    }
+
+    double endTime = CycleTimer::currentSeconds();
+//    printf("Thread %d: row (%d - %d)\t\ttime for execution is \t[%.3f]ms\n",
+//           args->threadId, startRow, startRow + numRows, (endTime - startTime) * 1000);
+    printf("Thread %d time for execution is\t[%.3f]ms\n",
+           args->threadId, (endTime - startTime) * 1000);
 }
 
 //
