@@ -6,7 +6,7 @@
 
 # allow some files
 !.gitignore
-!MY_README.md
+!README.md
 
 # allow those files (in subdirectories)
 !prog1_mandelbrot_threads
