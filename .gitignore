@@ -13,3 +13,4 @@
 prog1_mandelbrot_threads/*
 !prog1_mandelbrot_threads/mandelbrotThread.cpp
 !prog1_mandelbrot_threads/mandelbrot.ipynb
+!prog1_mandelbrot_threads/result.txt
