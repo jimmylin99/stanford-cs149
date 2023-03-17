@@ -14,3 +14,5 @@ prog1_mandelbrot_threads/*
 !prog1_mandelbrot_threads/mandelbrotThread.cpp
 !prog1_mandelbrot_threads/mandelbrot.ipynb
 !prog1_mandelbrot_threads/run.sh
+!prog1_mandelbrot_threads/auto_nb.py
+!prog1_mandelbrot_threads/plot*.png
