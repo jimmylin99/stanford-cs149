@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <thread>
 #include <cmath>
+#include <map>
+#include <utility>
+#include <sstream>
+#include <iomanip>
 
 #include "CycleTimer.h"
 
@@ -14,6 +18,8 @@ typedef struct {
     int threadId;
     int numThreads;
 } WorkerArgs;
+
+typedef std::map<int, std::pair<int, double>> CpuInfo;
 
 
 extern void mandelbrotSerial(
@@ -33,6 +39,16 @@ int fact(int n) {
 
 int combination(int n, int r) {
     return fact(n) / (fact(r) * fact(n - r));
+}
+
+std::string cpu_id_cnts_to_string(CpuInfo m) {
+    std::stringstream ss;
+    for (const auto e : m) {
+        int id = e.first, cnt = e.second.first;
+        double time = e.second.second;
+        ss << id << '(' << cnt << "iters," << std::setprecision(3) << time * 1000 << "ms)" << ' ';
+    }
+    return ss.str();
 }
 // auxiliary functions END
 
@@ -100,20 +116,25 @@ void workerThreadStart(WorkerArgs * const args) {
 //                     args->maxIterations,
 //                     args->output);
 
+    CpuInfo cpu_id_cnts;
     // Load balanced
     for (int i = args->threadId; i < args->height; i += args->numThreads) {
+        double iterStartTime = CycleTimer::currentSeconds();
         mandelbrotSerial(args->x0, args->y0, args->x1, args->y1,
                  args->width, args->height,
                  i, 1,
                  args->maxIterations,
                  args->output);
+        double iterEndTime = CycleTimer::currentSeconds();
+        cpu_id_cnts[sched_getcpu()].first ++;
+        cpu_id_cnts[sched_getcpu()].second += iterEndTime - iterStartTime;
     }
 
     double endTime = CycleTimer::currentSeconds();
 //    printf("Thread %d: row (%d - %d)\t\ttime for execution is \t[%.3f]ms\n",
 //           args->threadId, startRow, startRow + numRows, (endTime - startTime) * 1000);
-    printf("Thread %d time for execution is\t[%.3f]ms\n",
-           args->threadId, (endTime - startTime) * 1000);
+    printf("Thread %d time for execution is\t[%.3f]ms\trunning on core %s\n",
+           args->threadId, (endTime - startTime) * 1000, cpu_id_cnts_to_string(cpu_id_cnts).c_str());
 }
 
 //
@@ -170,5 +191,6 @@ void mandelbrotThread(
     for (int i=1; i<numThreads; i++) {
         workers[i].join();
     }
+    printf("-----\n");
 }
 
