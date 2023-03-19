@@ -286,10 +286,13 @@ void clampedExpVector(float* values, int* exponents, float* output, int N) {
             _cs149_vsub_int(count, count, oneInt, maskNotEqZero);
 
             // ---
-            // (TODO: check this statement's correctness) The following commented block consumes more instructions,
-            // and thus deprecated. However, I prefer this loop style
-            // if regardless of performance, since the loop logic is
-            // more compact.
+            // The following commented block consumes one more instruction
+            // if none of count greater than zero. Theoretically, it should be slower
+            // compared to the uncommented one.
+            // However, such performance improvement is too faint to
+            // demonstrate real effects, and the tests even show opposite trending
+            // Furthermore, I prefer the loop style of the commented code
+            // if regardless of performance, since the loop logic is more compact.
 //            // while (count > 0) {
 //            maskGtZero = _cs149_mask_and(maskNotEqZero, maskAll);
 //            while (true) {
@@ -346,11 +349,34 @@ float arraySumVector(float* values, int N) {
   //
   // CS149 STUDENTS TODO: Implement your vectorized version of arraySumSerial here
   //
-  
-  for (int i=0; i<N; i+=VECTOR_WIDTH) {
 
-  }
+    __cs149_vec_float sum = _cs149_vset_float(0.f);
+    __cs149_vec_float x;
+    __cs149_mask maskAll = _cs149_init_ones();
 
-  return 0.0;
+    for (int i=0; i<N; i+=VECTOR_WIDTH) {
+        _cs149_vload_float(x, values+i, maskAll);
+
+        _cs149_vadd_float(sum, sum, x, maskAll);
+    }
+
+    for (int i = VECTOR_WIDTH; i > 1; i /= 2) {
+        // aggregate the sum to the left half
+        // and the number of effective numbers
+        // reduces by half as shrinking to the leftmost side
+        //
+        // here is a hadd-interleave (h-i) operation
+        //  [a, b, c, d, e, f, g, h]
+        // ==>
+        //  [a+b, c+d, e+f, g+h, a+b, c+d, e+f, g+h]
+        // we pertain the sum of the vector on the leftmost side by half size
+        _cs149_hadd_float(sum, sum);
+        _cs149_interleave_float(sum, sum);
+    }
+
+    float *result = new float[VECTOR_WIDTH];
+    _cs149_vstore_float(result, sum, maskAll);
+
+    return result[0];
 }
 

@@ -98,21 +98,38 @@ Though more data and precise experiments are needed, we can basically infer that
 
 Summary:
 
+* Write instruction-level parallel codes with N-wide intrinsics
+* Branch and Loop is accomplished by masks, while loop is more sophisticated
+  * Handling masks is not that easy, strict patterns and coding styles (e.g. indent) should be followed
+  * Coming up with a parallelized algorithm with bit-wise and mask operations is not easy but interesting!
+
 Result:
 
 ```text
 ****************** Printing Vector Unit Statistics *******************
 Vector Width:              2
-Total Vector Instructions: 177728
-Vector Utilization:        78.1%
-Utilized Vector Lanes:     277547
-Total Vector Lanes:        355456
+Total Vector Instructions: 172728
+Vector Utilization:        77.7%
+Utilized Vector Lanes:     268565
+Total Vector Lanes:        345456
+****************** Printing Vector Unit Statistics *******************
+Vector Width:              4
+Total Vector Instructions: 99576
+Vector Utilization:        70.7%
+Utilized Vector Lanes:     281755
+Total Vector Lanes:        398304
+****************** Printing Vector Unit Statistics *******************
+Vector Width:              8
+Total Vector Instructions: 54128
+Vector Utilization:        67.1%
+Utilized Vector Lanes:     290451
+Total Vector Lanes:        433024
 ****************** Printing Vector Unit Statistics *******************
 Vector Width:              16
-Total Vector Instructions: 28843
-Vector Utilization:        65.9%
-Utilized Vector Lanes:     304082
-Total Vector Lanes:        461488
-
+Total Vector Instructions: 28218
+Vector Utilization:        65.4%
+Utilized Vector Lanes:     295102
+Total Vector Lanes:        451488
 ```
 
+For this program, the speedup using vectorization is significant and almost linear when vector width is not large. While the apparent decreasing trending of vector utilization indicates that there will be a point to saturate such speedup. But current architecture may not have large registers to support large vector width, so performance saturation might not be an issue.
