@@ -11,6 +11,7 @@ Summary:
 * Load balance all threads to reach better performance.
   * the trick itself is trivial, but I did not come up with it at the first glance (more practice!)
   * I kind of got stuck at division-and-conquer, while for arbitrarily complicated pattern, split the workload into tiny pieces and disperse them (which may be more trivial) is better.
+    * This idea is similar to the differential in calculus: for arbitrarily continuous function, the local behaviors are almost the same
 * Automated the workflow with shell scripts and jupyter notebook (a nice attempt after not using them for a long time)
 * Experiments to inspect on thread scheduling on heterogeneous architecture (interesting! there is more to discover yet)
 
