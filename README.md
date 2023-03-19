@@ -98,7 +98,7 @@ Though more data and precise experiments are needed, we can basically infer that
 
 Summary:
 
-* Write instruction-level parallel codes with N-wide intrinsics
+* SIMD: Write instruction-level parallel codes with N-wide intrinsics
 * Branch and Loop is accomplished by masks, while loop is more sophisticated
   * Handling masks is not that easy, strict patterns and coding styles (e.g. indent) should be followed
   * Coming up with a parallelized algorithm with bit-wise and mask operations is not easy but interesting!
