@@ -92,3 +92,27 @@ Thread 5 time for execution is  [56.727]ms      running on core 4(57iters,9.27ms
 ```
 
 Though more data and precise experiments are needed, we can basically infer that the performance drop is largely due to the performance difference between P-core and E-core. Thread rescheduling may also affect the execution time a little.
+
+
+## prog2
+
+Summary:
+
+Result:
+
+```text
+****************** Printing Vector Unit Statistics *******************
+Vector Width:              2
+Total Vector Instructions: 177728
+Vector Utilization:        78.1%
+Utilized Vector Lanes:     277547
+Total Vector Lanes:        355456
+****************** Printing Vector Unit Statistics *******************
+Vector Width:              16
+Total Vector Instructions: 28843
+Vector Utilization:        65.9%
+Utilized Vector Lanes:     304082
+Total Vector Lanes:        461488
+
+```
+

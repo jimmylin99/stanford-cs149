@@ -250,13 +250,14 @@ void clampedExpVector(float* values, int* exponents, float* output, int N) {
   // N and VECTOR_WIDTH, not just when VECTOR_WIDTH divides N
   //
 
-    __cs149_vec_float x, y, res, count;
+    __cs149_vec_float x, res;
+    __cs149_vec_int y, count;
     __cs149_vec_float result;
-    __cs149_vec_float zero = _cs149_vset_float(0.f);
-    __cs149_vec_float one = _cs149_vset_float(1.f);
+    __cs149_vec_int zeroInt = _cs149_vset_int(0);
+    __cs149_vec_int oneInt = _cs149_vset_int(1);
+    __cs149_vec_float oneFloat = _cs149_vset_float(1.f);
     __cs149_vec_float clampedVal = _cs149_vset_float(9.999999f);
-    __cs149_mask maskAll, maskEqualZero, maskNotEqZero, maskLtZero, maskLtClampedVal;
-    __cs149_vec_float x;
+    __cs149_mask maskAll, maskEqZero, maskNotEqZero, maskGtZero, maskGtClampedVal;
 
     for (int i = 0; i < N; i += VECTOR_WIDTH) {
         if (i + VECTOR_WIDTH <= N)
@@ -269,15 +270,58 @@ void clampedExpVector(float* values, int* exponents, float* output, int N) {
         _cs149_vload_int(y, exponents+i, maskAll);
 
         // if (y == 0) {
-        _cs149_veq_int(maskEqualZero, y, zero, maskAll);
+        _cs149_veq_int(maskEqZero, y, zeroInt, maskAll);
 
             // output[i] = 1.f
-            _cs149_vload_float(result, one, maskEqualZero);
+            _cs149_vmove_float(result, oneFloat, maskEqZero);
 
         // } else {
+        maskNotEqZero = _cs149_mask_not(maskEqZero);
 
-        _cs149_vload_float(res, x, )
+            // float result = x;
+            _cs149_vmove_float(res, x, maskNotEqZero);
 
+            // int count = y - 1;
+            _cs149_vmove_int(count, y, maskNotEqZero);
+            _cs149_vsub_int(count, count, oneInt, maskNotEqZero);
+
+            // ---
+            // (TODO: check this statement's correctness) The following commented block consumes more instructions,
+            // and thus deprecated. However, I prefer this loop style
+            // if regardless of performance, since the loop logic is
+            // more compact.
+//            // while (count > 0) {
+//            maskGtZero = _cs149_mask_and(maskNotEqZero, maskAll);
+//            while (true) {
+//                _cs149_vgt_int(maskGtZero, count, zeroInt, maskGtZero);
+//                if (_cs149_cntbits(maskGtZero) == 0)
+//                    break;
+            // ---
+
+            _cs149_vgt_int(maskGtZero, count, zeroInt, maskNotEqZero);
+            // while (count > 0) {
+            while(_cs149_cntbits(maskGtZero)) {
+                // result *= x
+                _cs149_vmult_float(res, res, x, maskGtZero);
+
+                // count --;
+                _cs149_vsub_int(count, count, oneInt, maskGtZero);
+
+                // loop tail
+                _cs149_vgt_int(maskGtZero, count, zeroInt, maskGtZero);
+            // }
+            }
+
+            // if (result > 9.999999f) {
+            _cs149_vgt_float(maskGtClampedVal, res, clampedVal, maskNotEqZero);
+
+                // result = 9.999999f;
+                _cs149_vmove_float(res, clampedVal, maskGtClampedVal);
+
+            // }
+
+            // output[i] = result;
+            _cs149_vmove_float(result, res, maskNotEqZero);
         // }
 
         _cs149_vstore_float(output+i, result, maskAll);
