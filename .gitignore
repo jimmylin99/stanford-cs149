@@ -16,3 +16,7 @@ prog1_mandelbrot_threads/*
 !prog1_mandelbrot_threads/run.sh
 !prog1_mandelbrot_threads/auto_nb.py
 !prog1_mandelbrot_threads/plot*.png
+
+!prog2_vecintrin
+prog2_vecintrin/*
+!prog2_vecintrin/main.cpp
