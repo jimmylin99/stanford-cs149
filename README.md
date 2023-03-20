@@ -133,3 +133,65 @@ Total Vector Lanes:        451488
 ```
 
 For this program, the speedup using vectorization is significant and almost linear when vector width is not large. While the apparent decreasing trending of vector utilization indicates that there will be a point to saturate such speedup. But current architecture may not have large registers to support large vector width, so performance saturation might not be an issue.
+
+## prog3 (WIP)
+
+Summary:
+
+* Usage of ISPC to achieve SPMD for mandelbrot program
+  * `foreach` semantic and internal variables `programCount`, `programIndex` together create automatic SIMD translation.
+  * `launch` semantic is used to create multicore translation.
+  * the combination of two will generate a much faster speedup
+* However, the key idea and result of this assignment is not yet clearly figured out myself.
+
+Result:
+
+```text
+(N is the task number)
+* N = 2
+[mandelbrot serial]:            [163.230] ms
+Wrote image file mandelbrot-serial.ppm
+[mandelbrot ispc]:              [46.104] ms
+Wrote image file mandelbrot-ispc.ppm
+[mandelbrot multicore ispc]:    [23.508] ms
+Wrote image file mandelbrot-task-ispc.ppm
+                                (3.54x speedup from ISPC)
+                                (6.94x speedup from task ISPC)
+* N = 4
+[mandelbrot serial]:            [163.422] ms
+Wrote image file mandelbrot-serial.ppm
+[mandelbrot ispc]:              [46.111] ms
+Wrote image file mandelbrot-ispc.ppm
+[mandelbrot multicore ispc]:    [18.560] ms
+Wrote image file mandelbrot-task-ispc.ppm
+                                (3.54x speedup from ISPC)
+                                (8.81x speedup from task ISPC)
+* N = 8
+[mandelbrot serial]:            [163.254] ms
+Wrote image file mandelbrot-serial.ppm
+[mandelbrot ispc]:              [45.905] ms
+Wrote image file mandelbrot-ispc.ppm
+[mandelbrot multicore ispc]:    [13.944] ms
+Wrote image file mandelbrot-task-ispc.ppm
+                                (3.56x speedup from ISPC)
+                                (11.71x speedup from task ISPC)
+* N = 16
+[mandelbrot serial]:            [479.902] ms
+Wrote image file mandelbrot-serial.ppm
+[mandelbrot ispc]:              [135.480] ms
+Wrote image file mandelbrot-ispc.ppm
+[mandelbrot multicore ispc]:    [24.617] ms
+Wrote image file mandelbrot-task-ispc.ppm
+                                (3.54x speedup from ISPC)
+                                (19.50x speedup from task ISPC)
+* N = 32
+[mandelbrot serial]:            [668.221] ms
+Wrote image file mandelbrot-serial.ppm
+[mandelbrot ispc]:              [188.485] ms
+Wrote image file mandelbrot-ispc.ppm
+[mandelbrot multicore ispc]:    [19.000] ms
+Wrote image file mandelbrot-task-ispc.ppm
+                                (3.55x speedup from ISPC)
+                                (35.17x speedup from task ISPC)
+```
+
