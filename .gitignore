@@ -20,3 +20,7 @@ prog1_mandelbrot_threads/*
 !prog2_vecintrin
 prog2_vecintrin/*
 !prog2_vecintrin/main.cpp
+
+!prog3_mandelbrot_ispc
+prog3_mandelbrot_ispc/*
+!prog3_mandelbrot_ispc/mandelbrot.ispc
